@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.Admin;
@@ -50,14 +51,10 @@ public class AdminController {
 	        eRepo.deleteById(id);
 	        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	    }
-
-	    @PostMapping("/admin/login")
-	    public ResponseEntity<Admin> login(@RequestBody Admin admin) {
-	        Admin existingAdmin = eRepo.findByUsername(admin.getUsername());
-	        if (existingAdmin != null && existingAdmin.getPwd().equals(admin.getPwd())) {
-	            return new ResponseEntity<>(existingAdmin, HttpStatus.OK);
-	        } else {
-	            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-	        }
+	    @GetMapping("/admin/login")
+	    public ResponseEntity<Admin> login(@RequestParam String username, @RequestParam String pwd) {
+	        Admin foundAdmin = eRepo.findByUsernameAndPwd(username, pwd)
+	                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+	        return ResponseEntity.ok(foundAdmin);
 	    }
 }
